@@ -18,18 +18,25 @@ ecommerce/
 │   │   ├── App.tsx             # Main Store App
 │   │   └── index.css           # Luxury design system with CSS custom properties
 │   └── package.json
-├── backend/                    # Backend: Node.js + Express + TypeScript
+├── backend/                    # Backend: Node.js + Express + TypeScript + Prisma ORM
+│   ├── prisma/
+│   │   ├── schema.prisma       # Prisma 7 PostgreSQL schema (Category, Product, Order, OrderItem)
+│   │   └── seed.ts             # Initial database catalog & category seeder
 │   ├── src/
-│   │   ├── controllers/        # Products, Orders, and Categories controllers
+│   │   ├── controllers/        # Products, Orders, and Categories controllers with Prisma queries
 │   │   ├── routes/             # RESTful API route definitions
-│   │   ├── data/               # Seed catalog & categories store
+│   │   ├── lib/prisma.ts       # Prisma Client singleton with PostgreSQL connection pool
+│   │   ├── data/               # Catalog fallbacks
 │   │   ├── middleware/         # 404 & global error handling
 │   │   ├── types/              # Backend data contracts & DTOs
 │   │   ├── app.ts              # Express application config & CORS
 │   │   └── server.ts           # Server entry point
+│   ├── .env                    # Environment variables (configured with DATABASE_URL)
 │   ├── .env.example            # Environment variables template
+│   ├── prisma.config.ts        # Prisma 7 CLI configuration
 │   ├── package.json
 │   └── tsconfig.json
+├── docker-compose.yml          # PostgreSQL 16 Alpine container configuration
 ├── package.json                # Monorepo orchestration scripts
 └── README.md
 ```
@@ -38,16 +45,32 @@ ecommerce/
 
 ## ⚡ Quick Start
 
-### 1. Backend Server Setup
+### 1. Start PostgreSQL (Docker)
+Start the PostgreSQL container:
+```bash
+docker compose up -d
+# or using the root npm shortcut:
+npm run docker:up
+```
+> Running on `localhost:5434` (mapped to port 5434 so it won't conflict with any other PostgreSQL services on 5432/5433).
+
+### 2. Backend Server & Database Setup
 From the root directory or inside `backend/`:
 ```bash
 cd backend
 npm install
-npm run dev
+npm run db:push    # Sync schema to PostgreSQL
+npm run db:seed    # Seed catalog & categories
+npm run dev        # Run API server with live reload
 ```
 > The API server will start on [http://localhost:5000](http://localhost:5000).
 
-### 2. Frontend Client Setup
+To view and edit database records visually via Prisma Studio:
+```bash
+npm run db:studio
+```
+
+### 3. Frontend Client Setup
 In a second terminal:
 ```bash
 cd frontend
@@ -56,8 +79,13 @@ npm run dev
 ```
 > The frontend will run on [http://localhost:5173](http://localhost:5173) and automatically communicate with the backend on port 5000.
 
-### 3. Running from Root
+### 4. Running from Root
 You can also run commands directly from the root repository:
+- `npm run docker:up` — Start PostgreSQL Docker container
+- `npm run docker:down` — Stop PostgreSQL Docker container
+- `npm run db:push` — Push Prisma schema to PostgreSQL
+- `npm run db:seed` — Seed initial data to database
+- `npm run db:studio` — Open Prisma Studio GUI
 - `npm run dev:backend` — Run backend with live reload
 - `npm run dev:frontend` — Run frontend Vite server
 - `npm run build:backend` — Compile backend TypeScript

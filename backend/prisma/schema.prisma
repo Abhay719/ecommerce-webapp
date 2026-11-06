@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  icon      String
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id                 String      @id @default(cuid())
+  title              String
+  brand              String
+  description        String
+  price              Float
+  originalPrice      Float?
+  discountPercentage Float?
+  rating             Float       @default(5.0)
+  reviewsCount       Int         @default(0)
+  categorySlug       String
+  category           Category?   @relation(fields: [categorySlug], references: [slug])
+  image              String
+  images             String[]    @default([])
+  inStock            Boolean     @default(true)
+  stockCount         Int         @default(0)
+  isFeatured         Boolean     @default(false)
+  isTrending         Boolean     @default(false)
+  tags               String[]    @default([])
+  specs              Json?
+  orderItems         OrderItem[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@map("products")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderId      String      @unique
+  subtotal     Float
+  shipping     Float
+  tax          Float
+  total        Float
+  customerName String
+  email        String
+  address      String
+  city         String
+  postalCode   String
+  status       String      @default("processing")
+  items        OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productTitle  String
+  productPrice  Float
+  productImage  String
+  quantity      Int      @default(1)
+  selectedColor String?
+  createdAt     DateTime @default(now())
+
+  @@map("order_items")
+}
