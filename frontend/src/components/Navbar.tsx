@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingBag, Heart, Search, X, Moon, Sun, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import type { Product } from '../types';
@@ -23,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   wishlistActive,
 }) => {
   const { cartCount, wishlist, setIsCartOpen } = useCart();
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   return (
     <header className="navbar-container">
@@ -30,21 +31,28 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="announcement-bar">
         <p>
           <Sparkles size={14} className="announcement-icon" />
-          <span>Complimentary worldwide express shipping on all orders over $150</span>
+          <span>Complimentary worldwide express shipping on orders over $150</span>
           <span className="announcement-code">CODE: <strong>AURA2026</strong></span>
         </p>
       </div>
 
       <nav className="navbar">
         <div className="nav-left">
-          <a href="#" className="brand-logo" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+          <a
+            href="#"
+            className="brand-logo"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
             <span className="logo-symbol">◇</span>
             <span className="logo-text">AURA</span>
             <span className="logo-badge">STUDIO</span>
           </a>
         </div>
 
-        {/* Global Search */}
+        {/* Global Desktop Search */}
         <div className="nav-center">
           <div className="search-bar">
             <Search size={18} className="search-icon" />
@@ -70,6 +78,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Actions */}
         <div className="nav-right">
+          {/* Mobile Search Toggle Button */}
+          <button
+            type="button"
+            className={`nav-icon-btn mobile-search-toggle-btn ${isMobileSearchOpen || searchQuery ? 'active' : ''}`}
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+            title="Search Products"
+            aria-label="Toggle search"
+          >
+            {isMobileSearchOpen ? <X size={18} /> : <Search size={18} />}
+          </button>
+
           <button
             type="button"
             className={`nav-icon-btn ${isDarkMode ? 'dark' : ''}`}
@@ -105,6 +124,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
       </nav>
+
+      {/* Expandable Mobile Search Row */}
+      {(isMobileSearchOpen || searchQuery) && (
+        <div className="mobile-search-bar-wrapper">
+          <div className="search-bar mobile-search-bar">
+            <Search size={18} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search audio, watches, lifestyle..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search catalog"
+              autoFocus
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };
