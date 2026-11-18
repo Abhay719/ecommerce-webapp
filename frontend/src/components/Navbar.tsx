@@ -31,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="announcement-bar">
         <p>
           <Sparkles size={14} className="announcement-icon" />
-          <span>Complimentary worldwide express shipping on orders over $150</span>
+          <span>Complimentary worldwides express shipping on orders over $150</span>
           <span className="announcement-code">CODE: <strong>AURA2026</strong></span>
         </p>
       </div>
